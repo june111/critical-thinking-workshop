@@ -44,7 +44,11 @@ export default {
     /*
      ** Plugins to load before mounting the App
      */
-    plugins: [],
+    plugins: [
+        '~/plugins/api',
+        { src: '~/plugins/lazyload', mode: 'client' },
+        { src: '~/plugins/localStorage.js', mode: 'client' }
+    ],
     /*
      ** Nuxt.js dev-modules
      */
@@ -57,16 +61,16 @@ export default {
      ** Nuxt.js modules
      */
     modules: [
-        // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/sitemap',
+        '@nuxtjs/sitemap',
         '@nuxtjs/google-analytics',
-        '@nuxtjs/axios'
+        '@nuxtjs/axios',
+           '@nuxtjs/proxy'
     ],
     sitemap: {
-    hostname: 'https://workshop.junezhu.top/',
-    cacheTime: 1000 * 60 * 15,
-    generate: true
-  },
+        hostname: 'https://workshop.junezhu.top/',
+        cacheTime: 1000 * 60 * 15,
+        generate: true
+    },
     'google-analytics': {
         id: 'UA-132667973-3',
         debug: {
@@ -77,7 +81,20 @@ export default {
      ** Axios module configuration
      ** See https://axios.nuxtjs.org/options
      */
-    axios: {},
+    axios: {
+        proxy: true,
+        prefix: '/api'
+    },
+    proxy: {
+        '/api': {
+            target: 'https://cloud-dev.pandax.tech',
+            pathRewrite: {
+                '^/api': '/'
+            },
+            changeOrigin: true
+        }
+    },
+
     /*
      ** vuetify module configuration
      ** https://github.com/nuxt-community/vuetify-module
@@ -97,6 +114,29 @@ export default {
                     success: colors.green.accent3
                 }
             }
+        }
+    },
+    router: {
+        scrollBehavior(to, from, savedPosition) {
+            if (savedPosition) {
+                return savedPosition
+            } else {
+                let position = {}
+                if (to.matched.length < 2) {
+                    position = { x: 0, y: 0 }
+                } else if (to.matched.some(r => r.components.default.options.scrollToTop)) {
+                    position = { x: 0, y: 0 }
+                }
+                if (to.hash) {
+                    position = { selector: to.hash }
+                }
+                return position
+            }
+        }
+    },
+    render: {
+        static: {
+            maxAge: 1000 * 60 * 60 * 24 * 7
         }
     },
     /*
