@@ -58,9 +58,15 @@ export default {
      */
     modules: [
         // Doc: https://axios.nuxtjs.org/usage
+    '@nuxtjs/sitemap',
         '@nuxtjs/google-analytics',
         '@nuxtjs/axios'
     ],
+    sitemap: {
+    hostname: 'https://workshop.junezhu.top/',
+    cacheTime: 1000 * 60 * 15,
+    generate: true
+  },
     'google-analytics': {
         id: 'UA-132667973-3',
         debug: {
